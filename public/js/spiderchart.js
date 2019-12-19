@@ -12,6 +12,8 @@ class SpiderChart {
         this.ticks_angle = 360 / this.ticks_num;
         this.radius = 400;
 
+        this.rota = 0;
+
         this.zoom = 15;
 
         this.tooltip = d3.select("body").append("div")	
@@ -88,23 +90,47 @@ class SpiderChart {
         .attr('x2', this.radius)
         .attr('y1', 0)
         .attr('y2', 0)
-        .attr('stroke', '#999');
+        .attr('stroke', '#dcdcdc');
 
         ticks
         .append('text')
-        .attr('x' ,this.radius - (this.radius / 4))
-        .attr('y' , -10)
+        .attr('class', 'keylegend')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#999')
+        .attr('font-weight', 'bold')
+        .attr('x' ,0)
+        .attr('y' , 0)
         .attr('data-index', (d,i)=>{
             return i;
         })
         .text((d,i)=>{
             return this.keys[i];
         })
+        .attr('transform', (d,i)=>{
+            var angle = this.ticks_angle * i;
+            return 'translate( '+this.radius+',-10) rotate(-'+angle+')'
+        })
         .on('click', (d,i)=>{
             var angle = -this.ticks_angle * i;
+            var rotation = this.rota - angle;
+            this.rota = angle;
+
+
+            if(rotation > 180){
+                angle = (360 + angle);
+            } else if(rotation < -180) {
+                angle = (360 - angle);
+            }
+
+            var stepangle = this.ticks_angle;
             // if(Math.abs(angle) > 180) angle = -(360 - angle);
             this.ticks.selectAll('.ticks_group').attr('transform', 'rotate('+angle+')')
             this.paths.attr('transform', 'translate(960,500) rotate('+angle+')')
+            this.ticks.selectAll('.keylegend').transition().attr('transform', (d,j)=>{
+                var newAngle = stepangle * j + angle;
+                // console.log(newAngle);
+                return 'translate( '+this.radius+',-10) rotate('+(-1 * newAngle)+')'
+            })
         })
         
     }
