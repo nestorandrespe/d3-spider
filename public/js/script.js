@@ -21,8 +21,15 @@
 		
 		data.push(obj);
 	}
+
+	var args = {
+		"radius": 400,
+		"width": 1000,
+		"height": 500,
+		"unit": '%'
+	};
 	// console.log(data);
-	var spider = new SpiderChart(gBarras, data, keys);
+	var spider = new SpiderChart(gBarras, data, keys, args);
 	spider.dibujar();
 
 })(jQuery, this);

@@ -1,5 +1,7 @@
 class SpiderChart {
-    constructor(elemT, dataT, keysT){
+    constructor(elemT, dataT, keysT, argsT){
+
+        this.args = argsT;
 
         this.elem = elemT;
         this.data = dataT;
@@ -10,7 +12,6 @@ class SpiderChart {
 
         this.ticks_num = keysT.length;
         this.ticks_angle = 360 / this.ticks_num;
-        this.radius = 400;
 
         this.rota = 0;
 
@@ -22,7 +23,7 @@ class SpiderChart {
 
         this.scaleLinear = d3.scaleLinear()
         .domain([0,this.zoom])
-        .range([0,this.radius]);
+        .range([0,this.args.radius]);
 
         this.color = d3.scaleOrdinal()
         .range(d3.schemePastel1);
@@ -74,7 +75,7 @@ class SpiderChart {
             .attr('text-anchor', 'middle')
             .attr('font-size', 11)
             .attr('fill', '#999')
-            .text((j*1.3).toFixed(2))
+            .text((j*1.3).toFixed(2) + this.args.unit)
 
             this.ticks.append('circle')
             .attr('fill', 'none')
@@ -87,7 +88,7 @@ class SpiderChart {
         ticks
         .append('line')
         .attr('x1', 0)
-        .attr('x2', this.radius)
+        .attr('x2', this.args.radius)
         .attr('y1', 0)
         .attr('y2', 0)
         .attr('stroke', '#dcdcdc');
@@ -108,7 +109,7 @@ class SpiderChart {
         })
         .attr('transform', (d,i)=>{
             var angle = this.ticks_angle * i;
-            return 'translate( '+this.radius+',-10) rotate(-'+angle+')'
+            return 'translate( '+this.args.radius+',-10) rotate(-'+angle+')'
         })
         .on('click', (d,i)=>{
             var angle = -this.ticks_angle * i;
@@ -129,7 +130,7 @@ class SpiderChart {
             this.ticks.selectAll('.keylegend').transition().attr('transform', (d,j)=>{
                 var newAngle = stepangle * j + angle;
                 // console.log(newAngle);
-                return 'translate( '+this.radius+',-10) rotate('+(-1 * newAngle)+')'
+                return 'translate( '+this.args.radius+',-10) rotate('+(-1 * newAngle)+')'
             })
         })
         
@@ -159,6 +160,7 @@ class SpiderChart {
             for(var i = 0; i < this.keys.length; i++){
                 var angle = i * this.ticks_angle;
                 var value = d[this.keys[i]];
+                var unit = this.args.unit;
                 angle = angle * (Math.PI / 180);
                 var radius = this.scaleLinear(value);
                 var xpos = radius * Math.cos(angle);
@@ -187,7 +189,7 @@ class SpiderChart {
                     tooltip.transition()		
                         .duration(200)		
                         .style("opacity", .9);		
-                    tooltip.html('<b>' + d.name + '</b><br>' + this.getAttribute('data-key') + ': ' + this.getAttribute('data-value'))	
+                    tooltip.html('<b>' + d.name + '</b><br>' + this.getAttribute('data-key') + ': ' + this.getAttribute('data-value') + unit)	
                         .style("left", (d3.event.pageX) + "px")		
                         .style("top", (d3.event.pageY - 50) + "px");	
                     })					
